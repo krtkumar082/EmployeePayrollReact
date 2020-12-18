@@ -1,0 +1,15 @@
+{
+    "employee": [
+      {
+        "name": "Mohit Mohit",
+        "departMent": [
+          "Engineer"
+        ],
+        "gender": "male",
+        "salary": "5000",
+        "startDate": "1 May 2020",
+        "notes": "",
+        "id": 1604589594368,
+        "profileUrl": "../../assets/profile-images/Ellipse -8.png"
+      }]
+      }
