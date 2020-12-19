@@ -7,4 +7,10 @@ export default class  EmployeeService{
     addEmployee(data) {
         return this.axiosService.postService(`${this.baseUrl}/employee`, data);
     }
+    getAllEmployee() {
+        return this.axiosService.getService(`${this.baseUrl}employee`);
+      }
+      getEmployee(id) {
+        return this.axiosService.getService(`${this.baseUrl}employee/${id}`);
+      }
 }
