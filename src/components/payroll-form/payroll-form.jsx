@@ -13,10 +13,10 @@ const PayrollForm = (props) =>{
     let initialValue = {
         name: '',
         profileArray: [
-            { url: '../../../assets/profile-images/Ellipse -3 (1).png' },
-            { url: '../../../assets/profile-images/Ellipse 1.png' },
-            { url: '../../../assets/profile-images/Ellipse -8.png' },
-            { url: '../../../assets/profile-images/Ellipse -7.png' }
+            { url: '../../assets/profile-images/Ellipse -3 (1).png' },
+            { url: '../../assets/profile-images/Ellipse -1.png' },
+            { url: '../../assets/profile-images/Ellipse -8.png' },
+            { url: '../../assets/profile-images/Ellipse -7.png' }
         ],
         allDepartment: [
             'HR', 'Sales', 'Finance', 'Engineer', 'Others'
@@ -42,6 +42,54 @@ const PayrollForm = (props) =>{
         }
     }
     const [formValue, setForm] = useState(initialValue);
+    const params = useParams();
+
+    useEffect(() => {
+        if (params.id) {   
+              getDataById(params.id);
+        }
+      }, []);
+
+      const getDataById = (id) => {
+        console.log(id);
+        employeeService
+          .getEmployee(id)
+          .then((data) => {
+            let obj = data.data;
+            setData(obj);
+            console.log(data.data);
+          })
+          .catch((err) => {
+            console.log("err is ", err);
+          });
+      };
+    
+    const setData = (obj) => {
+        console.log(obj);
+        let array = obj.startDate.split(" ");
+        setForm({
+          ...formValue,
+          ...obj,
+          id: obj.id,
+          departmentValue: obj.department,
+          isUpdate: true,
+          day: array[0],
+          month: array[1],
+          year: array[2],
+        });
+      };
+
+
+//    if(props.location.state){
+//        Object.assign(formValue,props.location.state[1]);
+//        formValue.isUpdate=true;
+//        const strs=formValue.startDate.split(" ");
+//        formValue.day=strs[0];
+//        formValue.month=strs[1];
+//        formValue.year=strs[2];
+//    }
+
+    
 
     const changeValue  = (event) => {
         setForm({ ...formValue, [event.target.name]: event.target.value })
@@ -70,24 +118,26 @@ const PayrollForm = (props) =>{
             profileUrl: '',
             startDate: ''
         }
-        if (formValue.name.length < 1){
-            error.name = 'name is required field'
+        if (!formValue.name.match('^[A-Z]{1}[a-zA-Z]{2,}')) {
+            error.name = 'Name is Invalid!!'
             isError = true;
         }
-        if (formValue.gender.length < 1){
-            error.gender = 'gender is required field'
+        if (formValue.gender.length < 1) {
+            error.gender = 'Gender is a required field'
             isError = true;
         }
-        if (formValue.salary.length < 1){
-            error.salary = 'salary is required field'
+        
+        if ((formValue.salary.valueOf()<400000)||(formValue.salary.valueOf()>500000)) {
+            error.salary = 'Salary should be between 4,00,000 and 5,00,000!!'
             isError = true;
         }
-        if (formValue.profileUrl.length < 1){
-            error.profileUrl = 'profile is required field'
+        if (formValue.profileUrl.length < 1) {
+            error.profileUrl = 'Profile is a required field'
             isError = true;
         }
-        if (formValue.departmentValue.length < 1){
-            error.department = 'department is required field'
+
+        if (formValue.departmentValue.length < 1) {
+            error.department = 'Department is a required field'
             isError = true;
         }
 
@@ -112,11 +162,23 @@ const PayrollForm = (props) =>{
             notes: formValue.notes,
             id: formValue.id
         }
-     
-        employeeService.addEmployee(object).then(data =>  {
+
+
+       console.log(formValue.isUpdate);
+      if(formValue.isUpdate){
+        employeeService.updateEmployee(formValue.id,object).then(data =>  {
+            console.log("data updated");
+            alert("Data updated :")
+            props.history.push('')
+        }).catch((err)=> console.log("err on update"));
+    }
+     else {employeeService.addEmployee(object).then(data =>  {
             console.log("data added");
+            alert("Data added :")
             props.history.push('')
         }).catch((err)=> console.log("err on add"));
+    }
+
     }
     const reset = () => {
         setForm({ ...initialValue, id: formValue.id, isUpdate: formValue.isUpdate});
@@ -130,7 +192,7 @@ const PayrollForm = (props) =>{
         return (
             <label>
                 <input type="radio" name="profileUrl" checked={formValue.profileUrl==props.profile} value={props.profile} onChange={changeValue} />
-                <img className="profile" src={props.profile} />
+                <img className="profile" src={profiles[formValue.profileArray.map(x=>x.url).indexOf(props.profile)]} />
             </label>
         );
     }
@@ -169,7 +231,7 @@ const PayrollForm = (props) =>{
                     <div className="row-content">
                         <label className="label text" htmlFor="profileUrl">Profile image</label>
                         <div className="profile-radio-content">
-                            {profiles.map((profile)=><ProfilePic key={profile.toString()} profile={profile}/>)}
+                            {formValue.profileArray.map((profile)=><ProfilePic key={profile.url.toString()} profile={profile.url}/>)}
                         </div>
                     </div>
                     <div className="error">{formValue.error.profileUrl}</div>
@@ -217,7 +279,7 @@ const PayrollForm = (props) =>{
                             placeholder="additional info.." style={{height: '100%'}}></textarea>
                     </div>
                     <div className="buttonParent">
-                        <Link to="./home.html" className="resetButton button cancelButton">Cancel</Link>
+                        <Link to="/home" className="resetButton button cancelButton">Cancel</Link>
                         <div className="submit-reset">
                             <button type="submit" className="button submitButton" id="submitButton" >{formValue.isUpdate ? 'Update' : 'Submit'}</button>
                             <button type="reset" onClick={reset} className="resetButton button">Reset</button>
