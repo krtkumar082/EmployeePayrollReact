@@ -15,6 +15,7 @@ export default class AxiosService{
 
     getService(url = "", tokenRequired = false, httpOptions = null) {
         return axios.get(url, tokenRequired && httpOptions);
+        
     }
     
     
