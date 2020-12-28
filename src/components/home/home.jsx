@@ -23,16 +23,17 @@ export default class Home extends React.Component {
     };
     componentDidMount() {
       this.getAllEmployee();
+      
     }
   
     getAllEmployee = () => {
     this.employeeService
         .getAllEmployee()
         .then((data) => {
-          console.log("data after get ", data.data);
+          console.log("data after get ", data.data.data);
           this.setState({
-            employeeArray: data.data,
-            AllEmployeeArray: data.data,
+            employeeArray: data.data.data,
+            AllEmployeeArray: data.data.data
           });
         })
         .catch((err) => {
